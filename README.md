@@ -140,6 +140,113 @@ This creates the table `SpotifyListeningHistory` with fields for metadata and im
 
 ### **Wrapped Highlights Page**
 ![Wrapped Highlights](assets/05_wrapped_highlights_page.png)
+---
+
+# 🎯 Use Case
+
+Spotify releases **Spotify Wrapped only once a year**, giving no real-time visibility into your listening patterns.  
+Users have no way to:
+
+- Analyze long-term listening habits  
+- Track top artists, genres, and songs over time  
+- Understand behavior patterns (time of day, weekdays vs weekends)  
+- Visualize insights in a BI dashboard  
+- Access or own their underlying listening data  
+
+This project solves this gap by creating your **own Spotify Wrapped experience**, available **anytime**, powered by Python, SQL Server, and Power BI.
+
+---
+
+# 🧩 Problem Statement
+
+Spotify does not provide:
+
+- A full historical listening activity export  
+- An interface for deep analytics  
+- Genre or image metadata through the recently played endpoint  
+- Tools for behavioral trend analysis  
+- A BI-friendly dataset structure  
+
+The core problem:  
+**Users do not have long-term access to their own listening history in a form suitable for analysis.**
+
+---
+
+# 🚀 Solution Overview
+
+This project builds an automated analytics system that continuously collects and enriches Spotify listening data:
+
+### ✔ Python + Spotify API (ETL Layer)
+- Pulls recently played tracks at short intervals  
+- Captures track, artist, album, duration, and timestamps  
+- Automatically handles OAuth token refresh  
+
+### ✔ SQL Server (Storage Layer)
+- Clean, normalized table structure  
+- Unique constraint prevents duplicates  
+- Stores enriched data (images, genre) for better BI visuals  
+
+### ✔ Metadata Enrichment
+- Fetches album covers & artist images  
+- Retrieves primary genre  
+- Updates SQL to maintain complete metadata for analytics  
+
+### ✔ Power BI Dashboard (Insights Layer)
+- Spotify Wrapped–style storytelling  
+- Trend analysis by day, hour, and listening behavior  
+- Top artists, genres, songs  
+- A visually rich experience enhanced using images  
+
+This pipeline functions as a **year-round Spotify Wrapped**, enabling personal analytics and showcasing full-stack data engineering skills.
+
+---
+
+# ⚔️ Limitations & Challenges (and How They Were Solved)
+
+### 1️⃣ Spotify API returns only the last 50 recently played tracks  
+**Solution:**  
+A scheduled Python script runs every few minutes, building a complete long-term dataset.
+
+---
+
+### 2️⃣ Duplicate plays returned by the API  
+**Solution:**  
+SQL constraint on **(TrackId, PlayedAtUtc)** ensures duplicates are never inserted.
+
+---
+
+### 3️⃣ API lacks album/artist images in the history endpoint  
+**Solution:**  
+A custom backfill script fetches high-quality images using additional Spotify API calls and updates SQL.
+
+---
+
+### 4️⃣ Power BI visuals break with missing images  
+**Solution:**  
+Backfill ensures all rows contain image URLs → consistent and clean dashboard visuals.
+
+---
+
+### 5️⃣ OAuth token expiration  
+**Solution:**  
+Spotipy’s `SpotifyOAuth` handles automatic refresh → stable long-running ETL.
+
+---
+
+### 6️⃣ Semi-structured API responses are not BI-ready  
+**Solution:**  
+Data is modeled into a relational SQL structure:
+
+- TrackId, TrackName  
+- ArtistId, ArtistName  
+- PrimaryGenre  
+- AlbumName  
+- AlbumImageUrl, ArtistImageUrl  
+- PlayedAtUtc  
+- DurationMs  
+- Source  
+
+Result: a clean, analytics-ready dataset.
 
 ---
 
